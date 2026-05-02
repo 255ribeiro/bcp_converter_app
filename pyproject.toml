@@ -19,7 +19,7 @@ bcp-converter = "bcp_converter.app:run"
 
 [tool.briefcase]
 project_name = "BCP Converter"
-bundle = "io.github.255ribeiro"
+bundle = "io.github.user255ribeiro"
 version = "0.1.0"
 url = "https://github.com/255ribeiro/bcp_converter_app"
 license.file = "LICENSE"
