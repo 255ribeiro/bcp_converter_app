@@ -82,7 +82,7 @@ jobs:
         run: |
           poetry install --only dev --no-root
 
-      - name: Build app with Briefcase
+      - name: Briefcase create
         run: |
           poetry run briefcase create \
             ${{ matrix.platform || matrix.target }} \
@@ -90,12 +90,16 @@ jobs:
             --no-input --log \
             ${{ matrix.briefcase-args }}
 
+      - name: Briefcase build
+        run: |
           poetry run briefcase build \
             ${{ matrix.platform || matrix.target }} \
             ${{ matrix.output-format }} \
             --no-input --log \
             ${{ matrix.briefcase-args }}
 
+      - name: Briefcase package
+        run: |
           poetry run briefcase package \
             ${{ matrix.platform || matrix.target }} \
             ${{ matrix.output-format }} \
