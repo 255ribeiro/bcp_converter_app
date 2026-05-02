@@ -80,7 +80,7 @@ jobs:
 
       - name: Install project dependencies
         run: |
-          poetry install
+          poetry install --only dev --no-root
 
       - name: Build app with Briefcase
         run: |
