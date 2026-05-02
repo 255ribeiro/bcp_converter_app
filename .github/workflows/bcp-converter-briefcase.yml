@@ -34,12 +34,15 @@ jobs:
         target: ["Windows", "macOS", "Ubuntu-24.04"]
         include:
           - target: "Windows"
+            platform: "windows"
             output-format: "app"
             runs-on: "windows-latest"
 
           - target: "macOS"
+            platform: "macOS"
             output-format: "app"
             runs-on: "macos-latest"
+            briefcase-package-args: "--adhoc-sign"
 
           - target: "Ubuntu-24.04"
             platform: "Linux"
@@ -84,8 +87,9 @@ jobs:
           poetry run briefcase package \
             ${{ matrix.platform || matrix.target }} \
             ${{ matrix.output-format }} \
-            --update --adhoc-sign --no-input --log \
-            ${{ matrix.briefcase-args }}
+            --update --no-input --log \
+            ${{ matrix.briefcase-args }} \
+            ${{ matrix.briefcase-package-args }}
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4
