@@ -34,7 +34,6 @@ jobs:
         target: ["Windows", "macOS", "Ubuntu-24.04"]
         include:
           - target: "Windows"
-            platform: "windows"
             output-format: "app"
             runs-on: "windows-latest"
 
@@ -48,7 +47,6 @@ jobs:
             platform: "Linux"
             output-format: "system"
             runs-on: "ubuntu-latest"
-            pre-command: "sudo apt-get update && sudo apt-get -y install socat"
             briefcase-args: "--target ubuntu:24.04"
 
     steps:
@@ -60,15 +58,28 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Poetry and dependencies
+      - name: Install Poetry
         run: |
           python -m pip install -U pip setuptools wheel
           python -m pip install poetry
-          poetry install
 
-      - name: Setup Environment
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
         run: |
-          ${{ matrix.pre-command }}
+          sudo apt-get update
+          sudo apt-get install -y \
+            socat \
+            build-essential \
+            libgirepository1.0-dev \
+            libcairo2-dev \
+            pkg-config \
+            python3-dev \
+            gir1.2-gtk-3.0 \
+            libgtk-3-dev
+
+      - name: Install project dependencies
+        run: |
+          poetry install
 
       - name: Build app with Briefcase
         run: |
