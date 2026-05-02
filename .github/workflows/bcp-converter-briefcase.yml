@@ -37,6 +37,7 @@ jobs:
           - target: "Windows"
             output-format: "app"
             runs-on: "windows-latest"
+            briefcase-package-args: "--adhoc-sign"
 
           - target: "macOS"
             platform: "macOS"
@@ -49,6 +50,7 @@ jobs:
             output-format: "system"
             runs-on: "ubuntu-latest"
             briefcase-args: "--target ubuntu:24.04"
+            skip-create: true
 
     steps:
       - name: Checkout
@@ -83,6 +85,7 @@ jobs:
           poetry install --only dev --no-root
 
       - name: Briefcase create
+        if: matrix.skip-create != true
         run: |
           poetry run briefcase create \
             ${{ matrix.platform || matrix.target }} \
