@@ -46,7 +46,7 @@ jobs:
             briefcase-package-args: "--adhoc-sign"
 
           - target: "Ubuntu-24.04"
-            platform: "Linux"
+            platform: "linux"
             output-format: "system"
             runs-on: "ubuntu-latest"
             briefcase-args: "--target ubuntu:24.04"

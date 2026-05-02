@@ -27,8 +27,8 @@ author_email = "ffribeiro@gmail.com"
 
 [tool.briefcase.app.bcp_converter]
 formal_name = "BCP Converter"
-description = "Convert absolute <filepath> entries in BCP files to relative paths"
-long_description = "Desktop utility to convert absolute filepath tags in BCP files to relative paths with in-memory preview and save options."
+description = "Convert absolute filepath entries in BCP files to relative paths"
+long_description = "Desktop utility to convert absolute filepath entries in BCP files to relative paths with in-memory preview and save options."
 sources = ["src/bcp_converter"]
 requires = ["toga>=0.5.2"]
 
