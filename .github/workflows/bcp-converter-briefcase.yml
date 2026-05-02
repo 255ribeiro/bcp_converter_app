@@ -17,18 +17,36 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_COLOR: "1"
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
-    name: "${{ matrix.os }}"
-    runs-on: ${{ matrix.os }}
+    name: "${{ matrix.target }}"
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        target: ["Windows", "macOS", "Ubuntu-24.04"]
+        include:
+          - target: "Windows"
+            output-format: "app"
+            runs-on: "windows-latest"
 
-    defaults:
-      run:
-        working-directory: .
+          - target: "macOS"
+            output-format: "app"
+            runs-on: "macos-latest"
+
+          - target: "Ubuntu-24.04"
+            platform: "Linux"
+            output-format: "system"
+            runs-on: "ubuntu-latest"
+            pre-command: "sudo apt-get update && sudo apt-get -y install socat"
+            briefcase-args: "--target ubuntu:24.04"
 
     steps:
       - name: Checkout
@@ -39,39 +57,49 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
+      - name: Install Poetry and dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry
+          python -m pip install -U pip setuptools wheel
+          python -m pip install poetry
+          poetry install
 
-      - name: Install Linux system dependencies
-        if: runner.os == 'Linux'
+      - name: Setup Environment
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            libgirepository1.0-dev \
-            libcairo2-dev \
-            pkg-config \
-            python3-dev \
-            gir1.2-gtk-3.0 \
-            libgtk-3-dev
-
-      - name: Install project dependencies
-        run: poetry install
+          ${{ matrix.pre-command }}
 
       - name: Build app with Briefcase
         run: |
-          poetry run briefcase create
-          poetry run briefcase build
-          poetry run briefcase package
+          poetry run briefcase create \
+            ${{ matrix.platform || matrix.target }} \
+            ${{ matrix.output-format }} \
+            --no-input --log \
+            ${{ matrix.briefcase-args }}
+
+          poetry run briefcase build \
+            ${{ matrix.platform || matrix.target }} \
+            ${{ matrix.output-format }} \
+            --no-input --log \
+            ${{ matrix.briefcase-args }}
+
+          poetry run briefcase package \
+            ${{ matrix.platform || matrix.target }} \
+            ${{ matrix.output-format }} \
+            --update --adhoc-sign --no-input --log \
+            ${{ matrix.briefcase-args }}
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bcp-converter-${{ matrix.os }}-dist
-          path: |
-            dist/**
+          name: bcp-converter-${{ matrix.target }}-dist
+          path: dist/**
+          if-no-files-found: error
+
+      - name: Upload Briefcase logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bcp-converter-${{ matrix.target }}-logs
+          path: logs/**
           if-no-files-found: warn
 
   release:
@@ -87,14 +115,13 @@ jobs:
           path: release-assets
 
       - name: Validate required OS artifacts
-        shell: bash
         run: |
           set -euo pipefail
 
           required=(
-            "bcp-converter-ubuntu-latest-dist"
-            "bcp-converter-windows-latest-dist"
-            "bcp-converter-macos-latest-dist"
+            "bcp-converter-Windows-dist"
+            "bcp-converter-macOS-dist"
+            "bcp-converter-Ubuntu-24.04-dist"
           )
 
           missing=()
@@ -129,15 +156,6 @@ jobs:
             echo "No files found in downloaded artifacts."
             exit 1
           fi
-
-          {
-            echo "## Release Guard Passed"
-            echo
-            echo "All required OS artifact folders were found:"
-            for folder in "${required[@]}"; do
-              echo "- $folder"
-            done
-          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish release with artifacts
         uses: softprops/action-gh-release@v2
