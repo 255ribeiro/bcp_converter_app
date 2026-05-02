@@ -40,6 +40,57 @@ For development iteration:
 poetry run briefcase dev
 ```
 
+## 4. Install from Releases
+
+Download assets from the GitHub Releases page for your tag.
+
+### Windows
+
+- Download the Windows asset from the release.
+- Run the installer/package and follow the prompts.
+
+### macOS
+
+- Download the macOS asset from the release.
+- Open the app package and move it to Applications if desired.
+
+### Linux (Flatpak)
+
+- Download the Flatpak bundle from the release.
+- Install with Flatpak:
+
+```bash
+flatpak install --user --bundle ./<release-file>.flatpak
+```
+
+- Run the app:
+
+```bash
+flatpak run io.github.user255ribeiro.bcp_converter
+```
+
+### Pure Python (stdlib-only script)
+
+The release also includes `bcp-converter-python-tk.py`.
+
+Option A: Python from python.org
+
+1. Install Python 3 from https://www.python.org/downloads/
+2. Run:
+
+```bash
+python bcp-converter-python-tk.py
+```
+
+Option B: `uv` (no global Python install required)
+
+1. Install `uv`: https://docs.astral.sh/uv/getting-started/installation/
+2. Run with managed Python:
+
+```bash
+uv run --python 3.12 bcp-converter-python-tk.py
+```
+
 ## Notes
 
 - Keep `bundle`, `author`, and `author_email` in `pyproject.toml` updated before shipping.
