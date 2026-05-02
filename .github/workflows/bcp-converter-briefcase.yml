@@ -38,17 +38,20 @@ jobs:
             output-format: "app"
             runs-on: "windows-latest"
             briefcase-package-args: "--adhoc-sign"
+            poetry-install-args: ""
 
           - target: "macOS"
             platform: "macOS"
             output-format: "app"
             runs-on: "macos-latest"
             briefcase-package-args: "--adhoc-sign"
+            poetry-install-args: ""
 
           - target: "Linux-AppImage"
             platform: "linux"
             output-format: "appimage"
             runs-on: "ubuntu-latest"
+            poetry-install-args: "--only dev --no-root"
 
     steps:
       - name: Checkout
@@ -80,7 +83,7 @@ jobs:
 
       - name: Install project dependencies
         run: |
-          poetry install
+          poetry install ${{ matrix.poetry-install-args }}
 
       - name: Briefcase create
         run: |
