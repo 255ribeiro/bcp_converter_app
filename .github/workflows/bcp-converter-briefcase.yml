@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ["Windows", "macOS", "Ubuntu-24.04"]
+        target: ["Windows", "macOS", "Linux-AppImage"]
         include:
           - target: "Windows"
             output-format: "app"
@@ -45,11 +45,10 @@ jobs:
             runs-on: "macos-latest"
             briefcase-package-args: "--adhoc-sign"
 
-          - target: "Ubuntu-24.04"
+          - target: "Linux-AppImage"
             platform: "linux"
-            output-format: "system"
+            output-format: "appimage"
             runs-on: "ubuntu-latest"
-            briefcase-args: "--target ubuntu:24.04"
 
     steps:
       - name: Checkout
@@ -81,7 +80,7 @@ jobs:
 
       - name: Install project dependencies
         run: |
-          poetry install --only dev --no-root
+          poetry install
 
       - name: Briefcase create
         run: |
@@ -142,7 +141,7 @@ jobs:
           required=(
             "bcp-converter-Windows-dist"
             "bcp-converter-macOS-dist"
-            "bcp-converter-Ubuntu-24.04-dist"
+            "bcp-converter-Linux-AppImage-dist"
           )
 
           missing=()

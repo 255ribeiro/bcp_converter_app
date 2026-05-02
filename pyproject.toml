@@ -5,6 +5,7 @@ description = "BCP path converter desktop app"
 authors = ["Fernando Ferraz Ribeiro <ffribeiro@gmail.com>"]
 readme = "README.md"
 packages = [{ include = "bcp_converter", from = "src" }]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
