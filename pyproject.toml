@@ -32,6 +32,9 @@ description = "Convert absolute filepath entries in BCP files to relative paths"
 long_description = "Desktop utility to convert absolute filepath entries in BCP files to relative paths with in-memory preview and save options."
 sources = ["src/bcp_converter"]
 requires = ["toga>=0.5.2"]
+flatpak_runtime = "org.gnome.Platform"
+flatpak_runtime_version = "46"
+flatpak_sdk = "org.gnome.Sdk"
 
 [build-system]
 requires = ["poetry-core>=1.8.0"]
