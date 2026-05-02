@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ["Windows", "macOS", "Linux-AppImage"]
+        target: ["Windows", "macOS", "Linux-Flatpak"]
         include:
           - target: "Windows"
             output-format: "app"
@@ -47,9 +47,9 @@ jobs:
             briefcase-package-args: "--adhoc-sign"
             poetry-install-args: ""
 
-          - target: "Linux-AppImage"
+          - target: "Linux-Flatpak"
             platform: "linux"
-            output-format: "appimage"
+            output-format: "flatpak"
             runs-on: "ubuntu-latest"
             poetry-install-args: "--only dev --no-root"
 
@@ -72,6 +72,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
+            flatpak \
+            flatpak-builder \
             socat \
             build-essential \
             libgirepository-2.0-dev \
@@ -144,7 +146,7 @@ jobs:
           required=(
             "bcp-converter-Windows-dist"
             "bcp-converter-macOS-dist"
-            "bcp-converter-Linux-AppImage-dist"
+            "bcp-converter-Linux-Flatpak-dist"
           )
 
           missing=()
