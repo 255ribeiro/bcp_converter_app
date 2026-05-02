@@ -91,11 +91,6 @@ Option B: `uv` (no global Python install required)
 uv run --python 3.12 bcp-converter-python-tk.py
 ```
 
-## Notes
-
-- Keep `bundle`, `author`, and `author_email` in `pyproject.toml` updated before shipping.
-- Briefcase packaging is platform-native: build on Windows for Windows, on macOS for macOS, and on Linux for Linux.
-
 ## Toga runtime troubleshooting
 
 - If your editor shows `Import "toga" could not be resolved`, run `poetry install` and ensure VS Code is using the Poetry environment.
