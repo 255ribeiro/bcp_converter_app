@@ -87,6 +87,13 @@ jobs:
         run: |
           poetry install ${{ matrix.poetry-install-args }}
 
+      - name: Configure Flatpak sources
+        if: runner.os == 'Linux' && matrix.output-format == 'flatpak'
+        run: |
+          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak remotes
+          sudo flatpak update --appstream -y
+
       - name: Briefcase create
         run: |
           poetry run briefcase create \
