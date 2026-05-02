@@ -1,9 +1,11 @@
 # BCP Converter App (Standalone)
 
 This folder is a fully separate desktop app project using:
+
 - Poetry for dependency and environment management
 - Briefcase for app packaging/distribution
-- Toga as the UI framework (no Tkinter)
+- Toga as the UI framework
+- Tkinter for pure Python distribution
 
 ## 1. Setup
 
