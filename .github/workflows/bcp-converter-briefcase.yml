@@ -12,6 +12,7 @@ on:
       - "pyproject.toml"
       - "poetry.lock"
       - "README.md"
+      - "bcp-converter-python-tk.py"
       - ".github/workflows/bcp-converter-briefcase.yml"
 
 permissions:
@@ -141,10 +142,21 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-assets
+
+      - name: Add pure Python script asset
+        run: |
+          if [ ! -f "bcp-converter-python-tk.py" ]; then
+            echo "Missing bcp-converter-python-tk.py in repository checkout"
+            exit 1
+          fi
+          cp bcp-converter-python-tk.py release-assets/
 
       - name: Validate required OS artifacts
         run: |
