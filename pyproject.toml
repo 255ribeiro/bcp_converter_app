@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "bcp-converter"
+version = "0.1.0"
+description = "BCP path converter desktop app"
+authors = ["Fernando Ferraz Ribeiro <ffribeiro@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "bcp_converter", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+toga = "^0.5.2"
+
+[tool.poetry.group.dev.dependencies]
+briefcase = "^0.3.23"
+
+[tool.poetry.scripts]
+bcp-converter = "bcp_converter.app:run"
+
+[tool.briefcase]
+project_name = "BCP Converter"
+bundle = "io.github.255ribeiro"
+version = "0.1.0"
+url = "https://github.com/255ribeiro/bcp_converter_app"
+license.file = "LICENSE"
+author = "Fernando Ferraz Ribeiro"
+author_email = "ffribeiro@gmail.com"
+
+[tool.briefcase.app.bcp_converter]
+formal_name = "BCP Converter"
+description = "Convert absolute <filepath> entries in BCP files to relative paths"
+long_description = "Desktop utility to convert absolute filepath tags in BCP files to relative paths with in-memory preview and save options."
+sources = ["src/bcp_converter"]
+requires = ["toga>=0.5.2"]
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
