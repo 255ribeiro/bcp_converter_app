@@ -308,6 +308,17 @@ jobs:
             --output-filename=bcp-converter \
             ${{ matrix.nuitka-extra-args }}
 
+      - name: Debug Nuitka output structure
+        run: |
+          echo "Contents of dist-nuitka:"
+          ls -la dist-nuitka/ 2>/dev/null || echo "dist-nuitka/ does not exist"
+          echo ""
+          echo "Checking for expected paths:"
+          [ -d "dist-nuitka/bcp-converter.dist" ] && echo "✓ Found: dist-nuitka/bcp-converter.dist" || echo "✗ Not found: dist-nuitka/bcp-converter.dist"
+          [ -d "dist-nuitka/bcp-converter" ] && echo "✓ Found: dist-nuitka/bcp-converter" || echo "✗ Not found: dist-nuitka/bcp-converter"
+          [ -f "dist-nuitka/bcp-converter.exe" ] && echo "✓ Found: dist-nuitka/bcp-converter.exe" || echo "✗ Not found: dist-nuitka/bcp-converter.exe"
+          [ -f "dist-nuitka/bcp-converter" ] && echo "✓ Found: dist-nuitka/bcp-converter" || echo "✗ Not found: dist-nuitka/bcp-converter"
+
       - name: Prepare Nuitka release bundle
         env:
           OUTPUT_BINARY: ${{ matrix.output-binary }}
@@ -315,13 +326,28 @@ jobs:
         run: |
           mkdir -p release-nuitka
 
+          # Try primary path first
           if [ -d "${NUITKA_SOURCE_PATH}" ]; then
+            echo "Using directory: ${NUITKA_SOURCE_PATH}"
             cp -R "${NUITKA_SOURCE_PATH}/." release-nuitka/
           elif [ -f "${NUITKA_SOURCE_PATH}" ]; then
+            echo "Using file: ${NUITKA_SOURCE_PATH}"
             cp "${NUITKA_SOURCE_PATH}" "release-nuitka/${OUTPUT_BINARY}"
           else
-            echo "Expected Nuitka output not found at ${NUITKA_SOURCE_PATH}"
-            exit 1
+            # Fallback: search for any .dist or output directory
+            echo "Primary path not found (${NUITKA_SOURCE_PATH}), searching for alternatives..."
+            if [ -d "dist-nuitka/bcp-converter.dist" ]; then
+              echo "Found fallback: dist-nuitka/bcp-converter.dist"
+              cp -R "dist-nuitka/bcp-converter.dist/." release-nuitka/
+            elif [ -d "dist-nuitka/bcp-converter" ]; then
+              echo "Found fallback: dist-nuitka/bcp-converter"
+              cp -R "dist-nuitka/bcp-converter/." release-nuitka/
+            else
+              echo "ERROR: Expected Nuitka output not found at ${NUITKA_SOURCE_PATH}"
+              echo "Available paths in dist-nuitka:"
+              ls -la dist-nuitka/ 2>/dev/null || echo "dist-nuitka/ does not exist"
+              exit 1
+            fi
           fi
 
           if [ "${{ runner.os }}" = "Linux" ]; then
