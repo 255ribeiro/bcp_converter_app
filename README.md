@@ -77,7 +77,7 @@ The release also includes `bcp-converter-python-tk.py`.
 
 Option A: Python from python.org
 
-1. Install Python 3 from https://www.python.org/downloads/
+1. Install Python 3 from [python.org](https://www.python.org/downloads/)
 2. Run:
 
 ```bash
@@ -86,12 +86,47 @@ python bcp-converter-python-tk.py
 
 Option B: `uv` (no global Python install required)
 
-1. Install `uv`: https://docs.astral.sh/uv/getting-started/installation/
+1. Install `uv`: [Astral uv installation guide](https://docs.astral.sh/uv/getting-started/installation/)
 2. Run with managed Python:
 
 ```bash
 uv run --python 3.12 bcp-converter-python-tk.py
 ```
+
+### Portable binaries (PyInstaller)
+
+The release also includes download-and-run PyInstaller bundles for Windows, macOS, and Linux.
+
+#### Windows portable bundle
+
+- Download `bcp-converter-pyinstaller-windows.zip` from the release.
+- Extract the zip file.
+- Run `bcp-converter.exe`.
+
+#### macOS portable bundle
+
+- Download `bcp-converter-pyinstaller-macos.zip` from the release.
+- Extract the zip file.
+- Open `bcp-converter.app`.
+- If Gatekeeper blocks the app, right-click it and choose Open once, or run:
+
+```bash
+xattr -dr com.apple.quarantine bcp-converter.app
+```
+
+#### Linux portable bundle
+
+- Download `bcp-converter-pyinstaller-linux.zip` from the release.
+- Extract the zip file.
+- Mark the binary executable if needed:
+
+```bash
+chmod +x bcp-converter
+```
+
+- Run `./bcp-converter`.
+
+- The Linux binary is built on GitHub's Ubuntu runner, so very old distributions may need the raw Python script instead.
 
 ## Toga runtime troubleshooting
 

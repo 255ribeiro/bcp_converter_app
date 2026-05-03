@@ -38,6 +38,7 @@ jobs:
           - target: "Windows"
             output-format: "app"
             runs-on: "windows-latest"
+            briefcase-args: ""
             briefcase-package-args: "--adhoc-sign"
             poetry-install-args: ""
 
@@ -45,6 +46,7 @@ jobs:
             platform: "macOS"
             output-format: "app"
             runs-on: "macos-latest"
+            briefcase-args: ""
             briefcase-package-args: "--adhoc-sign"
             poetry-install-args: ""
 
@@ -52,6 +54,7 @@ jobs:
             platform: "linux"
             output-format: "flatpak"
             runs-on: "ubuntu-latest"
+            briefcase-args: ""
             poetry-install-args: "--only dev --no-root"
 
     steps:
@@ -135,10 +138,106 @@ jobs:
           path: logs/**
           if-no-files-found: warn
 
+  build-pyinstaller:
+    name: "PyInstaller ${{ matrix.target }}"
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: "Windows"
+            runs-on: "windows-latest"
+            archive-name: "bcp-converter-pyinstaller-windows.zip"
+
+          - target: "macOS"
+            runs-on: "macos-latest"
+            archive-name: "bcp-converter-pyinstaller-macos.zip"
+            codesign-command: "codesign --force --deep --sign - dist/bcp-converter.app"
+
+          - target: "Linux"
+            runs-on: "ubuntu-latest"
+            archive-name: "bcp-converter-pyinstaller-linux.zip"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: |
+          python -m pip install -U pip setuptools wheel
+          python -m pip install poetry
+
+      - name: Install Linux Tk dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk
+
+      - name: Install project dependencies
+        run: |
+          poetry install
+
+      - name: Build portable binary with PyInstaller
+        run: |
+          poetry run pyinstaller bcp-converter-python-tk.py \
+            --clean \
+            --onefile \
+            --windowed \
+            --name bcp-converter
+
+      - name: Ad-hoc sign macOS app bundle
+        if: runner.os == 'macOS'
+        run: |
+          ${{ matrix.codesign-command }}
+
+      - name: Package PyInstaller output
+        env:
+          ARCHIVE_NAME: ${{ matrix.archive-name }}
+        run: |
+          python - <<'PY'
+          import pathlib
+          import zipfile
+
+          dist_dir = pathlib.Path("dist")
+          output_dir = pathlib.Path("release-pyinstaller")
+          output_dir.mkdir(exist_ok=True)
+
+          archive_path = output_dir / pathlib.Path(__import__("os").environ["ARCHIVE_NAME"])
+          entries = sorted(path for path in dist_dir.iterdir() if path.name != archive_path.name)
+
+          if not entries:
+              raise SystemExit("PyInstaller did not produce any files in dist/")
+
+          with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as archive:
+              for entry in entries:
+                  if entry.is_dir():
+                      for child in entry.rglob("*"):
+                          if child.is_file():
+                              archive.write(child, child.relative_to(dist_dir))
+                  else:
+                      archive.write(entry, entry.name)
+
+          print(f"Created {archive_path}")
+          PY
+
+      - name: Upload PyInstaller artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bcp-converter-PyInstaller-${{ matrix.target }}
+          path: release-pyinstaller/*
+          if-no-files-found: error
+
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - build
+      - build-pyinstaller
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
