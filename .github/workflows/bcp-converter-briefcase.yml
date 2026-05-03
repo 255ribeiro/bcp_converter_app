@@ -336,17 +336,29 @@ jobs:
           else
             # Fallback: search for any .dist or output directory
             echo "Primary path not found (${NUITKA_SOURCE_PATH}), searching for alternatives..."
-            if [ -d "dist-nuitka/bcp-converter.dist" ]; then
-              echo "Found fallback: dist-nuitka/bcp-converter.dist"
-              cp -R "dist-nuitka/bcp-converter.dist/." release-nuitka/
-            elif [ -d "dist-nuitka/bcp-converter" ]; then
-              echo "Found fallback: dist-nuitka/bcp-converter"
-              cp -R "dist-nuitka/bcp-converter/." release-nuitka/
+            DIST_DIR="$(find dist-nuitka -maxdepth 1 -type d -name '*.dist' | head -n 1)"
+            if [ -n "${DIST_DIR}" ]; then
+              echo "Found fallback dist directory: ${DIST_DIR}"
+              cp -R "${DIST_DIR}/." release-nuitka/
             else
-              echo "ERROR: Expected Nuitka output not found at ${NUITKA_SOURCE_PATH}"
-              echo "Available paths in dist-nuitka:"
-              ls -la dist-nuitka/ 2>/dev/null || echo "dist-nuitka/ does not exist"
-              exit 1
+              FALLBACK_FILE=""
+              if [ -f "dist-nuitka/${OUTPUT_BINARY}" ]; then
+                FALLBACK_FILE="dist-nuitka/${OUTPUT_BINARY}"
+              elif [ -f "dist-nuitka/bcp-converter" ]; then
+                FALLBACK_FILE="dist-nuitka/bcp-converter"
+              elif [ -f "dist-nuitka/bcp-converter.exe" ]; then
+                FALLBACK_FILE="dist-nuitka/bcp-converter.exe"
+              fi
+
+              if [ -n "${FALLBACK_FILE}" ]; then
+                echo "Found fallback file: ${FALLBACK_FILE}"
+                cp "${FALLBACK_FILE}" "release-nuitka/${OUTPUT_BINARY}"
+              else
+                echo "ERROR: Expected Nuitka output not found at ${NUITKA_SOURCE_PATH}"
+                echo "Available paths in dist-nuitka:"
+                ls -la dist-nuitka/ 2>/dev/null || echo "dist-nuitka/ does not exist"
+                exit 1
+              fi
             fi
           fi
 
