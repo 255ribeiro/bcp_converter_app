@@ -137,7 +137,7 @@ These are built from the Toga UI app entrypoint.
 
 - Download `bcp-converter-nuitka-windows.zip` from the release.
 - Extract the zip file.
-- Run `bcp-converter.exe`.
+- Run `bcp-converter.exe` from the extracted folder.
 
 #### macOS Nuitka bundle
 

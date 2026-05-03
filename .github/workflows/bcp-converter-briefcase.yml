@@ -240,22 +240,28 @@ jobs:
             runs-on: "windows-latest"
             archive-name: "bcp-converter-nuitka-windows.zip"
             output-binary: "bcp-converter.exe"
-            nuitka-extra-args: "--windows-disable-console --msvc=latest --assume-yes-for-downloads"
+            build-mode-arg: "--standalone"
+            nuitka-extra-args: "--msvc=latest --assume-yes-for-downloads"
             toga-backend: "toga-winforms"
+            nuitka-source-path: "dist-nuitka/bcp-converter.dist"
 
           - target: "macOS"
             runs-on: "macos-latest"
             archive-name: "bcp-converter-nuitka-macos.zip"
             output-binary: "bcp-converter"
+            build-mode-arg: "--onefile"
             nuitka-extra-args: "--assume-yes-for-downloads"
             toga-backend: "toga-cocoa"
+            nuitka-source-path: "dist-nuitka/bcp-converter"
 
           - target: "Linux"
             runs-on: "ubuntu-latest"
             archive-name: "bcp-converter-nuitka-linux.zip"
             output-binary: "bcp-converter"
+            build-mode-arg: "--onefile"
             nuitka-extra-args: "--assume-yes-for-downloads"
             toga-backend: "toga-gtk"
+            nuitka-source-path: "dist-nuitka/bcp-converter"
 
     steps:
       - name: Checkout
@@ -289,7 +295,7 @@ jobs:
       - name: Build Toga binary with Nuitka
         run: |
           python -m nuitka bcp-converter-python-toga.py \
-            --onefile \
+            ${{ matrix.build-mode-arg }} \
             --output-dir=dist-nuitka \
             --output-filename=bcp-converter \
             ${{ matrix.nuitka-extra-args }}
@@ -297,9 +303,18 @@ jobs:
       - name: Prepare Nuitka release bundle
         env:
           OUTPUT_BINARY: ${{ matrix.output-binary }}
+          NUITKA_SOURCE_PATH: ${{ matrix.nuitka-source-path }}
         run: |
           mkdir -p release-nuitka
-          cp "dist-nuitka/${OUTPUT_BINARY}" "release-nuitka/${OUTPUT_BINARY}"
+
+          if [ -d "${NUITKA_SOURCE_PATH}" ]; then
+            cp -R "${NUITKA_SOURCE_PATH}/." release-nuitka/
+          elif [ -f "${NUITKA_SOURCE_PATH}" ]; then
+            cp "${NUITKA_SOURCE_PATH}" "release-nuitka/${OUTPUT_BINARY}"
+          else
+            echo "Expected Nuitka output not found at ${NUITKA_SOURCE_PATH}"
+            exit 1
+          fi
 
           if [ "${{ runner.os }}" = "Linux" ]; then
             printf '%s\n' \
