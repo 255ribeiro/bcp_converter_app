@@ -1,3 +1,9 @@
+# nuitka-project: --mode=onefile
+# nuitka-project-if: {OS} == "Windows":
+#    nuitka-project: --windows-disable-console
+# nuitka-project-if: {OS} == "Darwin":
+#    nuitka-project: --macos-create-app-bundle
+
 import os
 import re
 from pathlib import Path

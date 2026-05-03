@@ -128,6 +128,42 @@ chmod +x bcp-converter
 
 - The Linux binary is built on GitHub's Ubuntu runner, so very old distributions may need the raw Python script instead.
 
+### Portable binaries (Nuitka)
+
+The release also includes Nuitka bundles for Windows, macOS, and Linux.
+
+#### Windows Nuitka bundle
+
+- Download `bcp-converter-nuitka-windows.zip` from the release.
+- Extract the zip file.
+- Run `bcp-converter.exe`.
+
+#### macOS Nuitka bundle
+
+- Download `bcp-converter-nuitka-macos.zip` from the release.
+- Extract the zip file.
+- Run `./bcp-converter` from Terminal, or open it from Finder if marked executable.
+
+#### Linux Nuitka bundle
+
+- Download `bcp-converter-nuitka-linux.zip` from the release.
+- Extract the zip file.
+- Mark the binary executable if needed:
+
+```bash
+chmod +x bcp-converter
+```
+
+- Run `./bcp-converter`.
+- This bundle also includes `bcp-converter.desktop` so you can create a launcher entry.
+
+Example launcher installation:
+
+```bash
+mkdir -p ~/.local/share/applications
+cp bcp-converter.desktop ~/.local/share/applications/
+```
+
 ## Toga runtime troubleshooting
 
 - If your editor shows `Import "toga" could not be resolved`, run `poetry install` and ensure VS Code is using the Poetry environment.
