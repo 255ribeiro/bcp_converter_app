@@ -239,19 +239,19 @@ jobs:
             runs-on: "windows-latest"
             archive-name: "bcp-converter-nuitka-windows.zip"
             output-binary: "bcp-converter.exe"
-            nuitka-extra-args: "--windows-disable-console"
+            nuitka-extra-args: "--windows-disable-console --msvc=latest --assume-yes-for-downloads"
 
           - target: "macOS"
             runs-on: "macos-latest"
             archive-name: "bcp-converter-nuitka-macos.zip"
             output-binary: "bcp-converter"
-            nuitka-extra-args: ""
+            nuitka-extra-args: "--assume-yes-for-downloads"
 
           - target: "Linux"
             runs-on: "ubuntu-latest"
             archive-name: "bcp-converter-nuitka-linux.zip"
             output-binary: "bcp-converter"
-            nuitka-extra-args: ""
+            nuitka-extra-args: "--assume-yes-for-downloads"
 
     steps:
       - name: Checkout
