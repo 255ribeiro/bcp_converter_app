@@ -13,6 +13,7 @@ on:
       - "poetry.lock"
       - "README.md"
       - "bcp-converter-python-tk.py"
+      - "bcp-converter-python-toga.py"
       - ".github/workflows/bcp-converter-briefcase.yml"
 
 permissions:
@@ -265,19 +266,27 @@ jobs:
       - name: Install Nuitka toolchain
         run: |
           python -m pip install -U pip setuptools wheel
-          python -m pip install nuitka ordered-set zstandard
+          python -m pip install nuitka ordered-set zstandard toga
 
       - name: Install Linux Nuitka dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-tk patchelf gcc g++
+          sudo apt-get install -y \
+            patchelf \
+            gcc \
+            g++ \
+            pkg-config \
+            python3-dev \
+            libgirepository-2.0-dev \
+            libcairo2-dev \
+            gir1.2-gtk-3.0 \
+            libgtk-3-dev
 
-      - name: Build portable binary with Nuitka
+      - name: Build Toga binary with Nuitka
         run: |
-          python -m nuitka bcp-converter-python-tk.py \
+          python -m nuitka bcp-converter-python-toga.py \
             --onefile \
-            --enable-plugin=tk-inter \
             --output-dir=dist-nuitka \
             --output-filename=bcp-converter \
             ${{ matrix.nuitka-extra-args }}

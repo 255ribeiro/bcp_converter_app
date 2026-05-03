@@ -131,6 +131,7 @@ chmod +x bcp-converter
 ### Portable binaries (Nuitka)
 
 The release also includes Nuitka bundles for Windows, macOS, and Linux.
+These are built from the Toga UI app entrypoint.
 
 #### Windows Nuitka bundle
 
